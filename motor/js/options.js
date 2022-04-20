@@ -11,7 +11,7 @@ var options = function(){
 	
 	var save = function(){
 		localStorage.setItem("config", JSON.stringify(options_data));
-	}();
+	};
 
 	load();
 
@@ -43,7 +43,7 @@ var options = function(){
 				options_data.cards = this.num;
 				options_data.dificulty = this.dificulty;
 				save();
-				loadpage("../");
+				loadpage("../index.html");
 			}
 		}
 	});
