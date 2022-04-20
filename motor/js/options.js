@@ -3,14 +3,19 @@ var options = function(){
 	var options_data = {
 		cards:2, dificulty:"hard"
 	};
+
 	var load = function(){
 		var json = localStorage.getItem("config") || '{"cards":2,"dificulty":"hard"}';
 		options_data = JSON.parse(json);
 	};
+	
 	var save = function(){
 		localStorage.setItem("config", JSON.stringify(options_data));
-	};
+	}();
+
 	load();
+
+	//VUE
 	var vue_instance = new Vue({
 		el: "#options_id",
 		data: {
@@ -42,6 +47,7 @@ var options = function(){
 			}
 		}
 	});
+
 	return {
 		// Aquí dins hi ha la part pública de l'objecte
 		getOptionsString: function (){
@@ -55,6 +61,5 @@ var options = function(){
 		}
 	}; 
 }();
-
 
 
