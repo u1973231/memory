@@ -10,19 +10,20 @@ class GameScene extends Phaser.Scene {
 		this.cards = null;
 		this.firstClick = null;
 		this.seconClick = null;
-		this.score = 100;
+		this.vida = 100;
+		this.puntuacion = 0
 		this.correct = 0;
 
 		this.tiempoGiro = 60;
 		this.tiempoMostrarIn = 60;
-		this.penalizacion = 10;
+		this.penalizacion = 20;
 		this.girar = false;
 		
 		this.dibujarTapa = true;
 		
 		this.arraycards = [];
-
-		this.puntsHUD;
+		this.vidaHUD;
+		
     }
 
     preload (){	
@@ -33,8 +34,9 @@ class GameScene extends Phaser.Scene {
 		this.load.image('so', '../resources/so.png');
 		this.load.image('tb', '../resources/tb.png');
 		this.load.image('to', '../resources/to.png');
-
-		this.puntsHUD = this.add.text(16,16, 'Puntos: ' + this.score,{fontSize:'32px',fill: '#000'})
+		this.vidaHUD = this.add.text(16,16, 'Vida: ' + this.vida,{fontSize:'32px',fill: '#000'})
+		this.NivellHUD = this.add.text(600,16, 'Nivell: ' + this.puntuacion,{fontSize:'32px',fill: '#000'})
+		
 	}
 	
 	crearTapas(arraycards)
@@ -42,7 +44,7 @@ class GameScene extends Phaser.Scene {
 		this.cards = this.physics.add.staticGroup();		
 		//dibuja las cartas encima tapada
 		for(let j = 0; j < arraycards.length; j++)
-		{	
+		{			
 			if(j < 4)		
 				this.cards.create(250 + 100 * j,300, 'back');
 			else
@@ -58,14 +60,15 @@ class GameScene extends Phaser.Scene {
 				card.disableBody(true,true);
 				if (this.firstClick){ //click 2
 					if (this.firstClick.card_id !== card.card_id){
-						this.score -= this.penalizacion;
+						this.vida -= this.penalizacion;
+						//Actualizo HUD
+						this.vidaHUD.setText('Vida:' + this.vida);
 						//Activa un bool para que se giren las cartas d'aqui 2 segundos
 						this.seconClick = card;
 						this.girar = true
-						//Actualizo HUD
-						this.puntsHUD.setText('Puntos:' + this.score);
-						if (this.score <= 0){
-							alert("Game Over");
+					
+						if (this.vida <= 0){
+							alert("Game Over, NIVELL " + this.puntuacion);
 							loadpage("../");
 						}
 					}
@@ -73,8 +76,9 @@ class GameScene extends Phaser.Scene {
 						this.correct++;
 						this.firstClick = null;
 						if (this.correct >= options_data.cards){
-							alert("You Win with " + this.score + " points.");
-							loadpage("../");
+							this.puntuacion++;
+							this.NivellHUD.setText('Nivell:' + this.puntuacion);
+							this.create()
 						}
 					}
 					
@@ -87,26 +91,40 @@ class GameScene extends Phaser.Scene {
 	}
 
     create (){	
+		this.arraycards = []
+		this.dibujarTapa = true
+		this.correct = 0;
 
 		//Dificultad
+		var incr = 0;
+		var tempMin = 0;
 		switch(options_data.dificulty)
 		{
 			case("easy"):
-				this.tiempoGiro = 120;
-				this.tiempoMostrarIn = 500;
-				this.penalizacion = 10;
+				tempMin = 25
+				incr = 2;
 				break;
 			case("normal"):
-				this.tiempoGiro = 60;
-				this.tiempoMostrarIn = 300;
-				this.penalizacion = 20;
+				tempMin = 15
+				incr = 10;
 			break;
-			case("hard"):
-				this.tiempoGiro = 7;
-				this.tiempoMostrarIn = 60;
-				this.penalizacion = 40;
+			case("hard"):	
+				tempMin = 10		
+				incr = 15;
 			break;
 		}
+
+		
+
+		//Dificultad		
+		this.tiempoGiro = 50 - this.puntuacion * incr;
+		this.tiempoMostrarIn = 150 - this.puntuacion * incr;
+		this.penalizacion = 10;
+
+		if(this.tiempoGiro < 10) this.tiempoGiro = incr;
+		if(this.tiempoMostrarIn < 3) this.tiempoMostrarIn = tempMin;
+			
+		
 
 		this.cameras.main.setBackgroundColor(0xBFFCFF); //Color Fondo
 		
@@ -120,6 +138,7 @@ class GameScene extends Phaser.Scene {
 			let tipoCarta = tiposCarta[aux]; 
 			this.arraycards.push(tipoCarta);
 			this.arraycards.push(tipoCarta);
+			console.log(aux)
 			tiposCarta.splice(aux,1)			
 		}
 		
@@ -148,7 +167,6 @@ class GameScene extends Phaser.Scene {
 				this.add.image(250 + 100 * (j-4),450,this.arraycards[j]);
 
 			}
-				
 		}		
 	}
 	

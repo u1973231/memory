@@ -9,6 +9,9 @@ function start_game(){
 function phaser_game(){
 	loadpage("./html/phasergame.html");
 }
+function phaser_game2(){
+	loadpage("./html/phasergame2.html");
+}
 
 function exit (){
 	if (name != ""){
